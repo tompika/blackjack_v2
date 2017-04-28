@@ -1,0 +1,26 @@
+#surefire
+#Fri Apr 28 19:20:12 CEST 2017
+testClassesDirectory=/home/szilvacsku/NetBeansProjects/BlackJack/target/test-classes
+classPathUrl.4=/home/szilvacsku/.m2/repository/commons-codec/commons-codec/1.9/commons-codec-1.9.jar
+forkMode=once
+classPathUrl.3=/home/szilvacsku/.m2/repository/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.jar
+classPathUrl.2=/home/szilvacsku/.m2/repository/junit/junit/4.1/junit-4.1.jar
+useManifestOnlyJar=true
+classPathUrl.1=/home/szilvacsku/NetBeansProjects/BlackJack/target/classes
+reportsDirectory=/home/szilvacsku/NetBeansProjects/BlackJack/target/surefire-reports
+classPathUrl.0=/home/szilvacsku/NetBeansProjects/BlackJack/target/test-classes
+providerConfiguration=org.apache.maven.surefire.junit4.JUnit4Provider
+testSuiteDefinitionTestSourceDirectory=/home/szilvacsku/NetBeansProjects/BlackJack/src/test/java
+surefireClassPathUrl.1=/home/szilvacsku/.m2/repository/org/apache/maven/surefire/surefire-api/2.10/surefire-api-2.10.jar
+surefireClassPathUrl.0=/home/szilvacsku/.m2/repository/org/apache/maven/surefire/surefire-junit4/2.10/surefire-junit4-2.10.jar
+runOrder=filesystem
+useSystemClassLoader=true
+excludes0=**/*$*
+isTrimStackTrace=true
+enableAssertions=true
+includes2=**/*TestCase.java
+failIfNoTests=false
+includes1=**/*Test.java
+includes0=**/Test*.java
+childDelegation=false
+classPathUrl.5=/home/szilvacsku/.m2/repository/log4j/log4j/1.2.8/log4j-1.2.8.jar

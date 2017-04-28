@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="500.0" prefWidth="761.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hu.unideb.beadando.kartyajatek.view.HistoryFxmlController">
+   <children>
+      <TableView fx:id="roundView" prefHeight="500.0" prefWidth="761.0">
+        <columns>
+          <TableColumn fx:id="nevCol" prefWidth="182.99996948242188" text="Név" />
+          <TableColumn fx:id="jatekosCol" prefWidth="173.0" text="Játékos" />
+          <TableColumn fx:id="osztoCol" prefWidth="220.0" text="Osztó" />
+          <TableColumn fx:id="datumCol" maxWidth="282.0" prefWidth="184.0" text="Dátum" />
+        </columns>
+      </TableView>
+   </children>
+</AnchorPane>

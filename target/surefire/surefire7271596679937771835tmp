@@ -1,0 +1,7 @@
+#surefire
+#Fri Apr 28 19:20:12 CEST 2017
+maven.ext.class.path=/home/szilvacsku/netbeans-8.2/java/maven-nblib/netbeans-eventspy.jar
+user.dir=/home/szilvacsku/NetBeansProjects/BlackJack
+runfx.args=-jar '${project.build.directory}/${project.build.finalName}.jar'
+localRepository=/home/szilvacsku/.m2/repository
+basedir=/home/szilvacsku/NetBeansProjects/BlackJack
