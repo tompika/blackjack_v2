@@ -43,13 +43,14 @@ public class Data {
     private final String ROUNDS_DATA_XML = "rounds.xml";
 
     private String fileName;
-    private DateFormat dateFormatInTable;
-    private Calendar cal;
-    private String dateInTable;
+    private final DateFormat dateFormatInTable;
+    private final Calendar cal;
+    private final String dateInTable;
 
     Controller cont = Controller.getInstance();
 
     private ObservableList<Round> roundData = FXCollections.observableArrayList();
+    private ObservableList<PlayerRecord> recordData = FXCollections.observableArrayList();
 
     public Data() {
 
@@ -59,8 +60,14 @@ public class Data {
 
     }
 
-    public ObservableList<Round> getRoundData() {
+    public ObservableList<Round> getRoundData() throws IOException, ParserConfigurationException, SAXException {
+        load();
         return roundData;
+    }
+    
+    public ObservableList<PlayerRecord> getPlayerRecordData() throws ParserConfigurationException, SAXException, IOException{
+        loadRecordData();
+        return recordData;
     }
 
     public boolean findUserInData(String userName) {
@@ -121,11 +128,11 @@ public class Data {
                 transformer.transform(source, result);
 
             } catch (ParserConfigurationException | TransformerException e) {
-                e.printStackTrace();
+                logger.warn(e.getStackTrace());
             }
 
         } else {
-            logger.info("A kimeneti fajl letezik!");
+            logger.info("Az adatokat tartalmazo fajl letezik!");
             try {
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -158,7 +165,7 @@ public class Data {
                 transformer.transform(source, result);
 
             } catch (SAXException | IOException | ParserConfigurationException | TransformerException e) {
-                e.printStackTrace();
+                logger.warn(e.getStackTrace());
             }
 
         }
@@ -214,8 +221,59 @@ public class Data {
         return list;
 
     }
+    
+      public void deleteUser(String _nickName) {
 
-    public void load(String fileName) throws ParserConfigurationException, SAXException, IOException {
+        
+
+        try {
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+
+            Path path = Paths.get(System.getProperty("user.home"), ".blackjack", LOGIN_DATA_XML);
+
+            File loadFile = path.toFile();
+
+            if (loadFile.exists()) {
+                Document document;
+
+                document = builder.parse(loadFile);
+
+                NodeList nodeList = document.getElementsByTagName("player");
+
+                for (int i = 0; i < nodeList.getLength(); i++) {
+
+                    Node node = nodeList.item(i);
+
+                                        
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        Element e = (Element) node;
+
+                        String nickName = e.getElementsByTagName("nickname").item(0).getTextContent();
+                        String password = e.getElementsByTagName("password").item(0).getTextContent();
+
+                        if (_nickName.equals(nickName)) {
+                            while (node.hasChildNodes())
+                                node.removeChild(node.getFirstChild());
+                            logger.info(nickName + " sikeresen torolve!");
+                        }
+
+                    }
+                }
+            } else {
+                logger.warn("Nincs beolvashato fajl!");
+            }
+
+        } catch (SAXException | IOException | ParserConfigurationException ex) {
+            logger.info(Data.class.getName());
+        }
+
+    }
+      
+   
+    
+    public void load() throws ParserConfigurationException, SAXException, IOException {
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -226,7 +284,7 @@ public class Data {
         logger.info("Load fajl letezik: " + loadFile.exists());
 
         if (loadFile.exists()) {
-            logger.info("Lejatszott korok beoltese.");
+            logger.info("Lejatszott korok betoltese...");
             Document document = builder.parse(loadFile);
 
             NodeList nodeList = document.getElementsByTagName("round");
@@ -243,19 +301,69 @@ public class Data {
                     String oszto = e.getElementsByTagName("pccard").item(0).getTextContent();
                     String datum = e.getElementsByTagName("datum").item(0).getTextContent();
 
+                    if(cont.getPlayerName().equals("admin")){
+                       
+                    }
+                    else if(!cont.getPlayerName().equals(name)){
+                        continue;
+                        
+                    }
+                    
                     Round round = new Round(name, jatekos, oszto, datum);
-
                     roundData.add(round);
 
                 }
             }
+            logger.info("Lejatszott korok betoltve!");
         } else {
             logger.warn("Nincs beolvashato fajl!");
         }
 
     }
 
-    public void addRoundToFile(List<Integer> playerIn, List<Integer> pcIn, String inName) {
+    public void loadRecordData() throws ParserConfigurationException, SAXException, IOException {
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+
+        EncryptDecrypt crypto = new EncryptDecrypt();
+        
+        Path path = Paths.get(System.getProperty("user.home"), ".blackjack", LOGIN_DATA_XML);
+        File loadFile = path.toFile();
+
+        logger.info("Load fajl letezik: " + loadFile.exists());
+
+        if (loadFile.exists()) {
+            logger.info("Felhasznlo adatainak betoltese!");
+            Document document = builder.parse(loadFile);
+
+            NodeList nodeList = document.getElementsByTagName("player");
+
+            for (int i = 0; i < nodeList.getLength(); i++) {
+
+                Node node = nodeList.item(i);
+
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element e = (Element) node;
+
+                    String nickname = e.getElementsByTagName("nickname").item(0).getTextContent();
+                    String password = e.getElementsByTagName("password").item(0).getTextContent();
+
+
+                    PlayerRecord playerRec = new PlayerRecord(nickname, crypto.decrypt(password));
+
+                    recordData.add(playerRec);
+
+                }
+            }
+            logger.info(recordData.size() + " felhasznalo betoltve.");
+        } else {
+            logger.warn("Nincs beolvashato fajl!");
+        }
+
+    }
+
+    public void addRoundToFile(List<Card> playerIn, List<Card> pcIn, String nickName) {
 
         String folder_path = System.getProperty("user.home") + File.separator;
         folder_path += File.separator + ".blackjack";
@@ -266,7 +374,7 @@ public class Data {
         } else if (customDir.mkdirs()) {
             logger.info(customDir + " mappa letrehozva.");
         } else {
-            logger.info(customDir + " mappa letrehozasa nem sikerult.");
+            logger.warn(customDir + " mappa letrehozasa nem sikerult!");
         }
 
         Path path = Paths.get(System.getProperty("user.home"), ".blackjack", ROUNDS_DATA_XML);
@@ -280,26 +388,24 @@ public class Data {
             try {
 
                 builder = factory.newDocumentBuilder();
-
                 Document doc = builder.newDocument();
 
                 Element rootElement = doc.createElement("rounds");
                 doc.appendChild(rootElement);
 
                 Element round = doc.createElement("round");
-
                 rootElement.appendChild(round);
 
                 Element name = doc.createElement("name");
-                name.appendChild(doc.createTextNode(inName));
+                name.appendChild(doc.createTextNode(nickName));
                 round.appendChild(name);
 
                 Element playerCard = doc.createElement("playercard");
-                playerCard.appendChild(doc.createTextNode(playerIn.toString()));
+                playerCard.appendChild(doc.createTextNode(printCards(playerIn)));
                 round.appendChild(playerCard);
 
                 Element pcCard = doc.createElement("pccard");
-                pcCard.appendChild(doc.createTextNode(pcIn.toString()));
+                pcCard.appendChild(doc.createTextNode(printCards(pcIn)));
                 round.appendChild(pcCard);
 
                 Element datum = doc.createElement("datum");
@@ -308,6 +414,8 @@ public class Data {
 
                 TransformerFactory tFactory = TransformerFactory.newInstance();
                 Transformer transformer = tFactory.newTransformer();
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
                 DOMSource source = new DOMSource(doc);
                 StreamResult result = new StreamResult(saveFile);
@@ -327,7 +435,7 @@ public class Data {
                 Document doc;
 
                 doc = documentBuilder.parse(saveFile);
-                // parse("target/" + datee + ".xml");
+                
 
                 Element root = doc.getDocumentElement();
                 Element round = doc.createElement("round");
@@ -337,11 +445,11 @@ public class Data {
                 round.appendChild(name);
 
                 Element playerCard = doc.createElement("playercard");
-                playerCard.appendChild(doc.createTextNode(playerIn.toString()));
+                playerCard.appendChild(doc.createTextNode(printCards(playerIn)));
                 round.appendChild(playerCard);
 
                 Element pcCard = doc.createElement("pccard");
-                pcCard.appendChild(doc.createTextNode(pcIn.toString()));
+                pcCard.appendChild(doc.createTextNode(printCards(pcIn)));
                 round.appendChild(pcCard);
 
                 Element datum = doc.createElement("datum");
@@ -352,6 +460,8 @@ public class Data {
 
                 TransformerFactory tFactory = TransformerFactory.newInstance();
                 Transformer transformer = tFactory.newTransformer();
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
                 DOMSource source = new DOMSource(doc);
                 StreamResult result = new StreamResult(saveFile);
@@ -360,12 +470,19 @@ public class Data {
                 transformer.transform(source, result);
 
             } catch (SAXException | IOException | ParserConfigurationException | TransformerException e) {
-                e.printStackTrace();
+                logger.warn(e.getStackTrace());
             }
 
         }
         logger.info("Kimeneti fajl: " + saveFile.getPath());
 
+    }
+    
+    private String printCards(List<Card> list){
+        String res = "[";
+        res = list.stream().map((card) -> card + " ").reduce(res, String::concat);
+        res+="]";
+        return res;
     }
 
 }

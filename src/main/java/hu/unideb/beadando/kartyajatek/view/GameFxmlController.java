@@ -11,13 +11,18 @@ import java.util.List;
 import java.util.logging.Level;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
@@ -27,6 +32,8 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -98,10 +105,58 @@ public class GameFxmlController implements Initializable {
     @FXML
     private Label labelInfo;
 
+    @FXML
+    private Button btnAdmin;
+
+    @FXML
+    private MenuItem miHistory;
+
+    @FXML
+    void onActionAdmin(ActionEvent event) throws IOException {
+
+        Parent parent = FXMLLoader.load(getClass().getResource("/AdminFxml.fxml"));
+        Scene scene = new Scene(parent);
+
+        Stage stage = new Stage();
+
+        stage.setTitle("Felhasznalok");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.centerOnScreen();
+        stage.show();
+
+    }
+
+    @FXML
+    void mbHistoryOnAction(ActionEvent event) throws IOException {
+
+        Parent parent = FXMLLoader.load(getClass().getResource("/HistoryFxml.fxml"));
+        Scene scene = new Scene(parent);
+
+        Stage stage = new Stage();
+
+        stage.setTitle("Eredmények");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setScene(scene);
+        stage.centerOnScreen();
+        stage.show();
+
+    }
+
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
 
         try {
+
+            btnAdmin.setDisable(true);
+            btnAdmin.setVisible(false);
+
+            if (cont.getPlayerName().equals("admin")) {
+                btnAdmin.setDisable(false);
+                btnAdmin.setVisible(true);
+            }
+
             cont.loadCard();
 
             playerPont.setText("0");
@@ -113,7 +168,7 @@ public class GameFxmlController implements Initializable {
             tart.setDisable(true);
             lap.setDisable(true);
 
-            // labelName.setText(cont.getName());
+            labelName.setText(cont.getPlayerName());
             labelEgyenleg.setText("10000");
 
             BackgroundImage bgimage = new BackgroundImage(new Image("tableBackground.png", 0, 0, false, true),
@@ -125,7 +180,6 @@ public class GameFxmlController implements Initializable {
             labelInfo.setText("Sok szerencsét!");
             moveLap(hboxPcCard, 1, cardsPc);
 
-            // startState();
         } catch (IOException ex) {
             logger.error(ex.getStackTrace());
         }
@@ -134,12 +188,12 @@ public class GameFxmlController implements Initializable {
 
     @FXML
     private void buttonLapAction(ActionEvent event) throws IOException {
-        
+
         moveLap(hboxPlayerCard, 0, cardsPlayer);
         playerPont.setText(calculatePoint(cardsPlayer));
-        
-        checkWinner();
+
         tart.setDisable(false);
+        checkToMuch();
 
     }
 
@@ -194,6 +248,27 @@ public class GameFxmlController implements Initializable {
 
     }
 
+    private void checkToMuch() {
+
+        int player = cardsPlayer.stream()
+                .mapToInt(e -> e.getValue())
+                .sum();
+
+        int pc = cardsPc.stream()
+                .mapToInt(e -> e.getValue())
+                .sum();
+       
+        if(player > 21){
+            
+            labelInfo.setText("Vesztettél!\nLapjaid összege nagyobb mint 21!");
+            cont.roundToFile(cardsPlayer, cardsPc);
+            tart.setDisable(true);
+            lap.setDisable(true);
+            
+        }
+
+    }
+
     public void ujKor() {
 
         hboxPcCard.getChildren().clear();
@@ -202,31 +277,34 @@ public class GameFxmlController implements Initializable {
         cardsPc.clear();
         cardsPlayer.clear();
 
-    
         playerPont.setText("0");
         pcPont.setText("0");
         labelInfo.setText("");
-        labelEgyenleg.setText("");
+
+        tart.setDisable(false);
+        lap.setDisable(false);
         
-        tart.setDisable(true);
+
+        moveLap(hboxPcCard, 1, cardsPc);
 
     }
 
     @FXML
     public void buttonTart() {
-        
-        hboxPcCard.getChildren().remove(0);
 
-        moveLap(hboxPcCard, 0, cardsPc);
+        hboxPcCard.getChildren().remove(0);
+        cardsPc.clear();
+
+        
 
         try {
-
+            Thread.sleep(400);
+            moveLap(hboxPcCard, 0, cardsPc);
             Thread.sleep(400);
             moveLap(hboxPcCard, 0, cardsPc);
             pcPont.setText(calculatePoint(cardsPc));
 
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             logger.warn(e.getStackTrace());
         }
         checkWinner();
@@ -247,69 +325,84 @@ public class GameFxmlController implements Initializable {
 
         return ace ? Integer.toString(num) + " / " + Integer.toString(num + 11) : Integer.toString(num);
     }
-    
-    private void checkWinner(){
-        
-        if (getWinner().endsWith("GAMEOVER") ){
-            labelInfo.setText("Senki sem nyert!\nUj kor kovetkezik!");
-            ujKor();
+
+    private void checkWinner() {
+
+        if (getWinner().endsWith("GAMEOVER")) {
+            labelInfo.setText("Senki sem nyert!");
+            
+            tart.setDisable(true);
+            lap.setDisable(true);
+            
+            cont.roundToFile(cardsPlayer, cardsPc);
+
+        } else if (!getWinner().isEmpty()) {
+            labelInfo.setText("Nyertes: " + getWinner());
+                       
+            tart.setDisable(true);
+            lap.setDisable(true);
+            
+            cont.roundToFile(cardsPlayer, cardsPc);
+
         }
-        
-        else if( !getWinner().isEmpty() ){
-            labelInfo.setText(getWinner());
-            ujKor();
-        }
-        
-        
-    } 
-    
-    private String getWinner(){
-        
+
+    }
+
+    private String getWinner() {
+
         int player = cardsPlayer.stream()
                 .mapToInt(e -> e.getValue())
                 .sum();
-        
-        int pc     = cardsPc.stream()
+
+        int pc = cardsPc.stream()
                 .mapToInt(e -> e.getValue())
                 .sum();
-        
+
         int playerAce = player;
         int pcAce = pc;
-        
-        
-        int ace = (int)cardsPlayer.stream()
+
+        int ace = (int) cardsPlayer.stream()
                 .filter(e -> e.isAce())
                 .count();
-        
-        int acePc = (int)cardsPc.stream()
+
+        int acePc = (int) cardsPc.stream()
                 .filter(e -> e.isAce())
                 .count();
-        
-        if( ace > 0 ){
-            playerAce+=11;
+
+        if (ace > 0) {
+            playerAce += 11;
         }
-        if ( acePc > 0){
-            pcAce+=11;
+        if (acePc > 0) {
+            pcAce += 11;
         }
-        
-        
-         if( player > 21 || pc > 21){
-            return "GAMEOVER";
-         }
-        
-        
-        if( (player <= 21 || playerAce <= 21) && pc > 21){
-            logger.info("Nyertes jatekos:"+ cont.getPlayerName());
+
+        if (pc == player) {
+            logger.info("Dontetlen!");
+            return "DONTETLEN";
+        }
+          
+        else if (pc > 21 && player <= 21) {
+            logger.info("Nyertes jatekos: " + cont.getPlayerName());
             return cont.getPlayerName();
         }
-        else if( player > 21 && pc <= 21){
+
+      
+        else if (pc <= 21 && player <= 21) {
+            if ( (21 - player < 21 - pc ) || (21-playerAce < 21 - pcAce) ) {
+                logger.info("Nyertes jatekos: " + cont.getPlayerName());
+                return cont.getPlayerName(); 
+            }
+        }
+
+        if ((player <= 21 || playerAce <= 21) && pc > 21) {
+            logger.info("Nyertes jatekos: " + cont.getPlayerName());
+            return cont.getPlayerName();
+        } else if (player > 21 && pc <= 21) {
             logger.info("Nyertes jatekos: OSZTO");
             return "Oszto";
-        
+
         }
-        else{
-        }
-        
+
         return "";
-    } 
+    }
 }

@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 
 import hu.unideb.beadando.kartyajatek.Controller;
+import hu.unideb.beadando.kartyajatek.Data;
 import javafx.concurrent.Task;
 
 import javafx.event.ActionEvent;
@@ -13,7 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
+
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -91,10 +92,9 @@ public class StartFxmlController implements Initializable {
 
         Stage stage = new Stage();
 
-        stage.setTitle("Eredmények");
+        stage.setTitle("Előzmények");
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(scene);
-        stage.setResizable(false);
         stage.centerOnScreen();
         stage.show();
 
@@ -119,13 +119,21 @@ public class StartFxmlController implements Initializable {
                 return;
             }
 
+         
+            
             cont.setPlayerName(tfName.getText());
             logger.info("Jatekos neve beallitva: " + cont.getPlayerName());
-
+            
+            tfName.setText("");
+            pfPassword.setText("");
+            
             Parent login_parent = FXMLLoader.load(getClass().getResource("/GameFxml.fxml"));
             Scene gameScene = new Scene(login_parent);
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            //Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Stage stage = new Stage();
 
+            stage.setTitle("BlackJack");
+            stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(gameScene);
             stage.centerOnScreen();
             stage.setResizable(false);
@@ -142,6 +150,10 @@ public class StartFxmlController implements Initializable {
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
+        //Data data = new Data();
+        //data.deleteUser("wasd");
+        
+        btnHistory.setVisible(false);
     }
 
 }

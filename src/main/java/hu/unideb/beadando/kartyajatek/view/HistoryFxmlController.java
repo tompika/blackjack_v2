@@ -7,6 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 import hu.unideb.beadando.kartyajatek.Data;
 import hu.unideb.beadando.kartyajatek.Round;
+import java.util.logging.Level;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -37,16 +38,17 @@ public class HistoryFxmlController implements Initializable {
     public void HistoryFxmlController() {
 
         Data data = new Data();
-        //data.setFileName("rounds.xml");
+        
         try {
-            data.load("rounds.xml");
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
+            roundView.setItems(data.getRoundData());
+        } catch (IOException ex) {
+            logger.info(ex.getStackTrace());
+        } catch (ParserConfigurationException ex) {
+            logger.info(ex.getStackTrace());
+        } catch (SAXException ex) {
+            logger.info(ex.getStackTrace());
         }
-
         logger.info("History loaded!");
-  
-        roundView.setItems(data.getRoundData());
 
     }
 

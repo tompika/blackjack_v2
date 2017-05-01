@@ -88,10 +88,10 @@ public class Controller {
 
     public boolean Login(String userName, String password) {
 
-        if ( getDecryptedPassword(userName).equals(password)){
+        if (getDecryptedPassword(userName).equals(password)) {
             setPlayerName(userName);
         }
-        
+
         return getDecryptedPassword(userName).equals(password);
     }
 
@@ -117,7 +117,6 @@ public class Controller {
     public String getPlayerName() {
         return nickname;
     }
-
 
     public void loadCard() throws IOException {
         File folder = new File(Card.class.getClassLoader().getResource("cards/").getFile());
@@ -148,7 +147,7 @@ public class Controller {
 
                         }
                     } catch (IOException ex) {
-                        java.util.logging.Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+                        logger.warn(ex.getStackTrace());
                     }
 
                 }
@@ -168,6 +167,8 @@ public class Controller {
         int val = 0;
         Image im;
         boolean ace;
+        String color = "";
+        String type = "";
 
         for (String filename : fileAll) {
             InputStream is;
@@ -179,6 +180,7 @@ public class Controller {
             im = new Image(is);
 
             String[] str = filename.split("_");
+            //System.out.println(str[0] + " " + str[1] + " "+ str.length);
             if (str[0].matches("\\d+")) {
                 switch (Integer.valueOf(str[0])) {
                     case 2:
@@ -233,13 +235,40 @@ public class Controller {
                         break;
                 }
             }
-            Card c = new Card(val, im, ace);
+
+            if (str.length == 3) {
+                switch (str[2].replace(".png", "").replace("2", "")) {
+                    case "clubs":
+                        color = "black";
+                        type = "clubs";
+                        break;
+                    case "diamonds":
+                        color = "red";
+                        type = "diamonds";
+                        break;
+                    case "hearts":
+                        color = "red";
+                        type = "hearts";
+                        break;
+                    case "spades":
+                        color = "black";
+                        type = "spades";
+                        break;
+
+                    default:
+                        break;
+
+                }
+            }
+
+            Card c = new Card(val, im, ace, color, type);
             addCard(c);
         }
         Collections.shuffle(allCard);
         logger.info("Cards loaded!");
         logger.info("Cards shuffle: OK");
         logger.info(allCard.size() + " db kartya beolvasva.");
+        
 
     }
 
@@ -255,15 +284,13 @@ public class Controller {
     public Card getRandomCard() {
         int index = new Random().nextInt(allCard.size());
         if (allCard.size() > 0) {
-            logger.info("Lapok szama a pakliban: " + Integer.toString(allCard.size()-1));
+            logger.info("Lapok szama a pakliban: " + Integer.toString(allCard.size() - 1));
             return allCard.remove(index);
-            
+
         } else {
             logger.warn("Nincs beolvasott kartyalap!");
             return getBackCard();
         }
-        
-        
 
     }
 
@@ -272,18 +299,21 @@ public class Controller {
     }
 
     public Card getBackCard() {
-        Card back = new Card(0, new Image(Card.class.getClassLoader().getResourceAsStream("cards/0_back.png")), false);
+        Card back = new Card(0, new Image(Card.class.getClassLoader().getResourceAsStream("cards/0_back.png")), false, "", "");
 
         return back;
     }
 
-    public void setPlayerName(String nickName){
+    public void setPlayerName(String nickName) {
         this.nickname = nickName;
-        
-    }
-    public void toFile() {
 
-        //data.addRoundToFile(gameModel.getPlayer().getCards(), gameModel.getOszto().getCards(), gameModel.getPlayerName());
+    }
+
+    public void roundToFile(List<Card> playerCards, List<Card> pcCards) {
+        data = new Data();
+
+        data.addRoundToFile(playerCards, pcCards, this.nickname);
+
         logger.info("Jelenlegi kor kiirasra kerult.");
 
     }

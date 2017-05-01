@@ -17,11 +17,15 @@ public class Card {
     private int value;
     private boolean ace = false;
     private Image img;
+    private String color;
+    private String type;
 
-    public Card(int value, Image img, boolean ace) {
+    public Card(int value, Image img, boolean ace, String color, String type) {
         this.value = value;
         this.img = img;
         this.ace = ace;
+        this.color = color;
+        this.type = type;
     }
 
     public boolean isAce() {
@@ -36,10 +40,17 @@ public class Card {
         return img;
     }
 
+    public String getColor(){
+        return color;
+    }
+    
+    public String getType(){
+        return type;
+    }
     
     @Override
     public String toString() {
-        return Integer.toString(value);
+        return "(" + Integer.toString(value) + " " + type +")";
     }
 
 }

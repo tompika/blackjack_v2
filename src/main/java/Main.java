@@ -6,8 +6,6 @@ import javafx.application.Application;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.TextField;
-
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -48,7 +46,7 @@ public class Main extends Application {
 
 		this.primaryStage = primaryStage;
 
-		primaryStage.setTitle("BlackJack v1.0");
+		primaryStage.setTitle("BlackJack v2.0");
 		createBorderPane();
 
 	}
@@ -59,11 +57,12 @@ public class Main extends Application {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(Main.class.getResource("StartFxml.fxml"));
 
-			logger.info("Loader location: " + loader.getLocation());
 			rootGrid = (GridPane) loader.load();
 
 			Scene scene = new Scene(rootGrid);
-
+                        scene.getStylesheets().add("styles/Styles.css");
+                        
+                        
 			primaryStage.setScene(scene);
 			primaryStage.centerOnScreen();
 			primaryStage.show();
