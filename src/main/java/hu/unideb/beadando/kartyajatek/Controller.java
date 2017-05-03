@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javafx.fxml.FXMLLoader;
@@ -35,9 +34,14 @@ public class Controller {
     private static final Logger logger = LogManager.getLogger(Controller.class);
 
     private static List<Card> allCard = new ArrayList<Card>();
+    private static List<Card> onePakli = new ArrayList<Card>();
     private Data data;
     private String nickname;
 
+    private int paklik_szama;
+    private int egyenleg;
+    private int tet;
+    
     public static Controller getInstance() {
 
         if (instance == null) {
@@ -49,6 +53,52 @@ public class Controller {
 
     private Controller() {
     }
+    
+    public void setEgyenleg(int egyenleg){
+        this.egyenleg = egyenleg;
+    }
+    
+    public int getEgyenleg(){
+        return egyenleg;
+    }
+    
+    public void setTet(int tet){
+        this.tet = tet;
+    }
+    
+    public int getTet(){
+        return tet;
+    }
+    
+    public void setPaklikSzama(int szama){
+        this.paklik_szama = szama;
+        logger.info("Paklik szama beallitva: " + this.paklik_szama);
+    }
+    
+    public int getPaklikSzama(){
+        return paklik_szama;
+    }
+    
+    public void calculateEgyenleg(int irany){
+        
+        if( irany > 0){
+            setEgyenleg(egyenleg + tet);
+            logger.info("(+) Uj egyenleg= " + egyenleg);
+            
+        }
+        else if(irany < 0){
+            setEgyenleg(egyenleg-tet);
+            logger.info("(-) Uj egyenleg= " + egyenleg);
+        }
+        else if(irany == 0){
+            setEgyenleg(egyenleg + tet/2);
+            logger.info("(+) Uj egyenleg= " + egyenleg);
+        }
+            
+        
+        
+    }
+            
 
     public void Register() throws IOException {
 
@@ -122,6 +172,9 @@ public class Controller {
         File folder = new File(Card.class.getClassLoader().getResource("cards/").getFile());
         List<String> fileAll = new ArrayList<>();
 
+        if( !allCard.isEmpty())
+            clearCardList();
+        
         logger.info("Folder isDir: " + folder.isDirectory());
         logger.info("Folder exists: " + folder.exists());
 
@@ -264,11 +317,23 @@ public class Controller {
             Card c = new Card(val, im, ace, color, type);
             addCard(c);
         }
+        
+        this.onePakli = allCard;
+        
+        
+        if( getPaklikSzama() > 0){
+            List<Card> temp = onePakli;
+            
+            for(int i = 0; i<getPaklikSzama() -1 ;i++)
+                allCard.addAll(temp);
+            
+           Collections.shuffle(allCard);
+        }
+        
         Collections.shuffle(allCard);
         logger.info("Cards loaded!");
         logger.info("Cards shuffle: OK");
         logger.info(allCard.size() + " db kartya beolvasva.");
-        
 
     }
 

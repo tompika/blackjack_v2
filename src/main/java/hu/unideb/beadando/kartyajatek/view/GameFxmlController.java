@@ -64,13 +64,7 @@ public class GameFxmlController implements Initializable {
     private HBox hboxPlayerCard;
 
     @FXML
-    private Label labelPlayerPont;
-
-    @FXML
     private Label playerPont;
-
-    @FXML
-    private Label labelPcPont;
 
     @FXML
     private Label pcPont;
@@ -160,8 +154,7 @@ public class GameFxmlController implements Initializable {
             cont.loadCard();
 
             playerPont.setText("0");
-            pcPont.setText("0");
-
+            
             hboxPlayerCard.setAlignment(Pos.CENTER);
             hboxPcCard.setAlignment(Pos.CENTER);
 
@@ -170,6 +163,7 @@ public class GameFxmlController implements Initializable {
 
             labelName.setText(cont.getPlayerName());
             labelEgyenleg.setText("10000");
+            cont.setEgyenleg(10000);
 
             BackgroundImage bgimage = new BackgroundImage(new Image("tableBackground.png", 0, 0, false, true),
                     BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,
@@ -178,7 +172,7 @@ public class GameFxmlController implements Initializable {
             gameBorder.setBackground(new Background(bgimage));
 
             labelInfo.setText("Sok szerencsét!");
-            moveLap(hboxPcCard, 1, cardsPc);
+                   
 
         } catch (IOException ex) {
             logger.error(ex.getStackTrace());
@@ -186,6 +180,25 @@ public class GameFxmlController implements Initializable {
 
     }
 
+    @FXML
+    void ujKor(ActionEvent event) {
+        
+        
+        hboxPcCard.getChildren().clear();
+        hboxPlayerCard.getChildren().clear();
+
+        cardsPc.clear();
+        cardsPlayer.clear();
+
+        playerPont.setText("0");
+        pcPont.setText("0");
+        labelInfo.setText("Uj kör kezdődott!");
+        
+        buttonTet.setDisable(false);
+        
+    }
+
+    
     @FXML
     private void buttonLapAction(ActionEvent event) throws IOException {
 
@@ -205,7 +218,8 @@ public class GameFxmlController implements Initializable {
         alert.setHeaderText(null);
 
         if (!textFieldTet.getText().isEmpty()) {
-            if (Integer.parseInt(textFieldTet.getText()) < 0) {
+            if (Integer.parseInt(textFieldTet.getText()) < 0 && 
+                    cont.getEgyenleg() >= Integer.valueOf(textFieldTet.getText())) {
                 labelInfo.setText("Töltsd fel az egyenleged!");
                 alert.setContentText("NO CASH!");
                 alert.show();
@@ -213,10 +227,21 @@ public class GameFxmlController implements Initializable {
             } else {
 
                 labelTet.setText(textFieldTet.getText());
+                cont.setTet(Integer.valueOf(labelTet.getText()));
 
                 lap.setDisable(false);
-
                 tart.setDisable(false);
+                buttonTet.setDisable(true);
+                buttonUjKor.setDisable(true);
+                
+                moveLap(hboxPcCard, 1, cardsPc);
+                moveLap(hboxPcCard, 0, cardsPc);
+                
+                moveLap(hboxPlayerCard, 0, cardsPlayer);
+                moveLap(hboxPlayerCard, 0, cardsPlayer);
+                
+                playerPont.setText(calculatePoint(cardsPlayer));
+                pcPont.setText(calculatePoint(cardsPc));
             }
         } else {
 
@@ -234,6 +259,8 @@ public class GameFxmlController implements Initializable {
         } else {
             card = cont.getRandomCard();
         }
+        
+     
 
         list.add(card);
 
@@ -243,7 +270,7 @@ public class GameFxmlController implements Initializable {
         imView.setImage(img);
         imView.setFitWidth(80);
         imView.setFitHeight(150);
-
+        
         hbox.getChildren().add(imView);
 
     }
@@ -262,30 +289,15 @@ public class GameFxmlController implements Initializable {
             
             labelInfo.setText("Vesztettél!\nLapjaid összege nagyobb mint 21!");
             cont.roundToFile(cardsPlayer, cardsPc);
+            
+            cont.calculateEgyenleg(-1);
+            labelEgyenleg.setText(String.valueOf(cont.getEgyenleg()));
+            
             tart.setDisable(true);
             lap.setDisable(true);
+            buttonUjKor.setDisable(false);
             
         }
-
-    }
-
-    public void ujKor() {
-
-        hboxPcCard.getChildren().clear();
-        hboxPlayerCard.getChildren().clear();
-
-        cardsPc.clear();
-        cardsPlayer.clear();
-
-        playerPont.setText("0");
-        pcPont.setText("0");
-        labelInfo.setText("");
-
-        tart.setDisable(false);
-        lap.setDisable(false);
-        
-
-        moveLap(hboxPcCard, 1, cardsPc);
 
     }
 
@@ -293,15 +305,19 @@ public class GameFxmlController implements Initializable {
     public void buttonTart() {
 
         hboxPcCard.getChildren().remove(0);
-        cardsPc.clear();
-
-        
+        cardsPc.remove(0);
+              
 
         try {
-            Thread.sleep(400);
-            moveLap(hboxPcCard, 0, cardsPc);
-            Thread.sleep(400);
-            moveLap(hboxPcCard, 0, cardsPc);
+           
+            //amíg az oszto lapjaniak értéke nem éri el a 17-et, lapot húz
+            while( cardsPc.stream().mapToInt(e -> e.getValue()).sum() < 17){
+                Thread.sleep(300);
+                moveLap(hboxPcCard, 0, cardsPc);
+                
+            }
+            
+                       
             pcPont.setText(calculatePoint(cardsPc));
 
         } catch (InterruptedException e) {
@@ -311,6 +327,34 @@ public class GameFxmlController implements Initializable {
 
     }
 
+    private void startState(){
+        
+        hboxPcCard.getChildren().clear();
+        hboxPlayerCard.getChildren().clear();
+
+        cardsPc.clear();
+        cardsPlayer.clear();
+
+        playerPont.setText("0");
+        pcPont.setText("0");
+        labelInfo.setText("Uj kör kezdődott!");
+
+        tart.setDisable(false);
+        lap.setDisable(false);
+        
+        moveLap(hboxPcCard, 1, cardsPc);
+        moveLap(hboxPcCard, 0, cardsPc);
+        
+        pcPont.setText(calculatePoint(cardsPc));
+        
+        moveLap(hboxPlayerCard, 1, cardsPlayer);
+        moveLap(hboxPlayerCard, 0, cardsPlayer);
+        
+        playerPont.setText(calculatePoint(cardsPlayer));
+        
+    }
+    
+    
     private String calculatePoint(List<Card> list) {
 
         int num = 0;
@@ -331,16 +375,24 @@ public class GameFxmlController implements Initializable {
         if (getWinner().endsWith("GAMEOVER")) {
             labelInfo.setText("Senki sem nyert!");
             
+            labelEgyenleg.setText(String.valueOf(cont.getEgyenleg()));
+            
             tart.setDisable(true);
             lap.setDisable(true);
+            buttonTet.setDisable(true);
+            buttonUjKor.setDisable(false);
             
             cont.roundToFile(cardsPlayer, cardsPc);
 
         } else if (!getWinner().isEmpty()) {
             labelInfo.setText("Nyertes: " + getWinner());
+            
+            labelEgyenleg.setText(String.valueOf(cont.getEgyenleg()));
                        
             tart.setDisable(true);
             lap.setDisable(true);
+            buttonTet.setDisable(true);
+            buttonUjKor.setDisable(false);
             
             cont.roundToFile(cardsPlayer, cardsPc);
 
@@ -378,11 +430,13 @@ public class GameFxmlController implements Initializable {
 
         if (pc == player) {
             logger.info("Dontetlen!");
+            cont.calculateEgyenleg(0);
             return "DONTETLEN";
         }
           
         else if (pc > 21 && player <= 21) {
             logger.info("Nyertes jatekos: " + cont.getPlayerName());
+            cont.calculateEgyenleg(1);
             return cont.getPlayerName();
         }
 
@@ -390,15 +444,14 @@ public class GameFxmlController implements Initializable {
         else if (pc <= 21 && player <= 21) {
             if ( (21 - player < 21 - pc ) || (21-playerAce < 21 - pcAce) ) {
                 logger.info("Nyertes jatekos: " + cont.getPlayerName());
+                cont.calculateEgyenleg(1);
                 return cont.getPlayerName(); 
             }
         }
 
-        if ((player <= 21 || playerAce <= 21) && pc > 21) {
-            logger.info("Nyertes jatekos: " + cont.getPlayerName());
-            return cont.getPlayerName();
-        } else if (player > 21 && pc <= 21) {
+        else if (player > 21 && pc <= 21) {
             logger.info("Nyertes jatekos: OSZTO");
+            cont.calculateEgyenleg(-1);
             return "Oszto";
 
         }

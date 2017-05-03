@@ -6,7 +6,9 @@ import java.util.ResourceBundle;
 
 
 import hu.unideb.beadando.kartyajatek.Controller;
-import hu.unideb.beadando.kartyajatek.Data;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import javafx.concurrent.Task;
 
 import javafx.event.ActionEvent;
@@ -27,6 +29,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.Alert.AlertType;
 
 import javafx.concurrent.Service;
+import javafx.scene.control.ChoiceDialog;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -120,6 +123,25 @@ public class StartFxmlController implements Initializable {
             }
 
          
+            List<String> choices = new ArrayList<>();
+            choices.add("1");
+            choices.add("2");
+            choices.add("3");
+
+            ChoiceDialog<String> dialog = new ChoiceDialog<>("1", choices);
+            dialog.setTitle("Paklik száma");
+            dialog.setHeaderText(null);
+            dialog.setContentText("Válassza ki, hogy hány paklival szeretne játszani:");
+
+            // Traditional way to get the response value.
+            Optional<String> result = dialog.showAndWait();
+            if (result.isPresent()){
+                cont.setPaklikSzama(Integer.valueOf(result.get()));
+            }
+
+            
+            
+            
             
             cont.setPlayerName(tfName.getText());
             logger.info("Jatekos neve beallitva: " + cont.getPlayerName());

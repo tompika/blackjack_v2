@@ -10,6 +10,7 @@ import java.net.URL;
 
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -53,6 +54,9 @@ public class RegistrationController implements Initializable {
         if (tfNickName.getText().isEmpty()) {
             
             tfNickName.setId("empty");    
+            
+            Platform.runLater(() -> tfNickName.requestFocus());
+            
             alert.setContentText("A felhasználói név megadása kötelező!");
             alert.show();
             return;
@@ -67,7 +71,7 @@ public class RegistrationController implements Initializable {
                 pwfPassword2.setId("empty");
             }
             
-            
+            Platform.runLater(() -> pwfPassword.requestFocus());
             alert.setContentText("A jelszó megadása kötelező!");
             alert.show();
             return;
@@ -75,6 +79,7 @@ public class RegistrationController implements Initializable {
         }
         
         if( !pwfPassword.getText().equals(pwfPassword2.getText())){
+            Platform.runLater(() -> pwfPassword.requestFocus());
             alert.setContentText("A két jelszó nem egyezik meg!");
             alert.show();
             return;
