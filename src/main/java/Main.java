@@ -1,9 +1,7 @@
 
+import hu.unideb.beadando.kartyajatek.controller.Controller;
 import java.io.IOException;
-
-import hu.unideb.beadando.kartyajatek.Controller;
 import javafx.application.Application;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -15,67 +13,71 @@ import org.apache.log4j.Logger;
 /**
  * Main osztály - A projekt belépési pontja, létrehozza a játékhoz tartozó
  * modell és fxml objektumokat.
- * 
+ *
  * @author Szilvácsku Péter
  *
  */
 public class Main extends Application {
 
-	private static final Logger logger = LogManager.getLogger(Main.class);
-	private Stage primaryStage;
+    private static final Logger logger = LogManager.getLogger(Main.class);
 
-	@SuppressWarnings("unused")
-	private BorderPane rootPane;
-	private GridPane rootGrid;
+    private Stage primaryStage;
 
-	public static void main(String[] args) {
-		@SuppressWarnings("unused")
-		Controller cont = Controller.getInstance();
+    @SuppressWarnings("unused")
+    private BorderPane rootPane;
+    private GridPane rootGrid;
 
-		logger.info("Controller betoltve.");
-	
-		
-		launch(args);
+    public static void main(String[] args) {
+        @SuppressWarnings("unused")
+        Controller cont = Controller.getInstance();
+       
+        logger.info("Controller betoltve.");
+        cont.init();
+        launch(args);
 
-		logger.info("A program leallt.");
+        logger.info("A program leallt.");
 
-	}
+    }
 
-	@Override
-	public void start(Stage primaryStage) {
+    @Override
+    public void start(Stage primaryStage) {
 
-		this.primaryStage = primaryStage;
+        this.primaryStage = primaryStage;
 
-		primaryStage.setTitle("BlackJack v2.0");
-		createBorderPane();
+        primaryStage.setTitle("BlackJack v2.0");
+        createBorderPane();
+        
+       
+        
+    }
 
-	}
+    private void createBorderPane() {
 
-	private void createBorderPane() {
+        Controller cont = Controller.getInstance();
+        
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(Main.class.getResource("StartFxml.fxml"));
 
-		try {
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(Main.class.getResource("StartFxml.fxml"));
+            rootGrid = (GridPane) loader.load();
 
-			rootGrid = (GridPane) loader.load();
+            Scene scene = new Scene(rootGrid);
+            scene.getStylesheets().add("styles/Styles.css");
 
-			Scene scene = new Scene(rootGrid);
-                        scene.getStylesheets().add("styles/Styles.css");
-                        
-                        
-			primaryStage.setScene(scene);
-			primaryStage.centerOnScreen();
-			primaryStage.show();
 
-		} catch (IOException e) {
-			e.printStackTrace();
+            primaryStage.setScene(scene);
+            primaryStage.centerOnScreen();
+            primaryStage.show();
 
-		}
-	}
+        } catch (IOException e) {
+            e.printStackTrace();
 
-	@Override
-	public void stop() {
-		logger.info("A gui leallt.");
-	}
+        }
+    }
+
+    @Override
+    public void stop() {
+        logger.info("A gui leallt.");
+    }
 
 }

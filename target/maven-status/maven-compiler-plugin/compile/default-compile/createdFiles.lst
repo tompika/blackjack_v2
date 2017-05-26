@@ -3,12 +3,16 @@ hu/unideb/beadando/kartyajatek/view/GameFxmlController.class
 hu/unideb/beadando/kartyajatek/Card.class
 hu/unideb/beadando/kartyajatek/view/StartFxmlController.class
 hu/unideb/beadando/kartyajatek/view/StartFxmlController$1$1.class
+hu/unideb/beadando/kartyajatek/view/AdminFxmlController.class
+hu/unideb/beadando/kartyajatek/PlayerRecord.class
 hu/unideb/beadando/kartyajatek/view/StartFxmlController$1.class
 hu/unideb/beadando/kartyajatek/Oszto.class
 hu/unideb/beadando/kartyajatek/EncryptDecrypt.class
+hu/unideb/beadando/kartyajatek/GameDAO.class
 Main.class
 hu/unideb/beadando/kartyajatek/view/HistoryFxmlController.class
 hu/unideb/beadando/kartyajatek/Data.class
 hu/unideb/beadando/kartyajatek/Round.class
 hu/unideb/beadando/kartyajatek/Player.class
 hu/unideb/beadando/kartyajatek/Controller.class
+hu/unideb/beadando/kartyajatek/GameModel.class
