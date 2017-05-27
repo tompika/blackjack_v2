@@ -5,9 +5,11 @@
  */
 package hu.unideb.beadando.kartyajatek.manager;
 
-import hu.unideb.beadando.kartyajatek.controller.Controller;
+
 import hu.unideb.beadando.kartyajatek.model.Card;
 import hu.unideb.beadando.kartyajatek.model.GameModel;
+import hu.unideb.beadando.kartyajatek.model.Oszto;
+import hu.unideb.beadando.kartyajatek.model.Player;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javafx.scene.image.Image;
@@ -25,14 +26,22 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 /**
- *
+ * A játék irányitásáért felelős osztály.
  * @author szilvacsku
  */
 public class GameManagerImpl implements GameManager {
 
     private static final Logger logger = LogManager.getLogger(GameManagerImpl.class);
 
-    GameModel gameModel = Controller.getInstance().getGameModel();
+    private GameModel gameModel;
+
+    public GameManagerImpl() {
+        this.gameModel = new GameModel();
+    }   
+    
+    public GameModel getGameModel(){
+        return gameModel;
+    }
 
     @Override
     public void loadCard(int packOfCardsCount) {
@@ -246,20 +255,109 @@ public class GameManagerImpl implements GameManager {
 
     @Override
     public Card getBackCard() {
+     
         Card back = new Card(0, new Image(Card.class.getClassLoader().getResourceAsStream("cards/0_back.png")), false, "", "");
 
         return back;
 
     }
-
+    
     @Override
-    public String getWinner() {
+    public void calculatePoint() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void calculatePoint() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public String getWinnerName(Player _player, Oszto _oszto) {
+        
+        List<Card> playerCards = _player.getCards();
+        List<Card> osztoCards = _oszto.getCards();
+        
+        String playerNickName = _player.getNickname();
+        String osztoName = _oszto.getName();
+        
+        String nyertes = "";
+        
+        
+        int player = playerCards.stream()
+                .mapToInt(e -> e.getValue())
+                .sum();
+
+        int oszto = osztoCards.stream()
+                .mapToInt(e -> e.getValue())
+                .sum();
+
+        int playerAce = player;
+        int osztoAce = oszto;
+
+        int ace = (int) playerCards.stream()
+                .filter(e -> e.isAce())
+                .count();
+
+        int aceOszto = (int) osztoCards.stream()
+                .filter(e -> e.isAce())
+                .count();
+
+        if (ace > 0) {
+            playerAce += 11;
+        }
+        if (aceOszto > 0) {
+            osztoAce += 11;
+        }
+
+        if (oszto == player) {
+            logger.info("Dontetlen!");
+            //cont.calculateEgyenleg(0);
+            nyertes = "Dontetlen!";
+        }
+        
+         else if (oszto <= 21 && player <= 21) {
+            if ( (21 - player < 21 - oszto ) || (21-playerAce < 21 - osztoAce) ) {
+                logger.info("Nyertes jatekos: " + playerNickName);
+                //calculateEgyenleg(1);
+                nyertes = playerNickName;
+            }
+            else if ( (21 - player > 21 - oszto ) || (21 - playerAce > 21 - osztoAce) ){
+                logger.info("Nyertes jatekos: " + "Oszto");
+                //calculateEgyenleg(-1);
+                nyertes = "Oszto";
+            }
+        }
+       
+        
+        else if (oszto > 21 && player <= 21) {
+            logger.info("Nyertes jatekos: " + playerNickName);
+            //calculateEgyenleg(1);
+            nyertes = playerNickName;
+         
+        }
+
+        else if (player > 21 && oszto <= 21) {
+            logger.info("Nyertes jatekos: " +  osztoName);
+            //calculateEgyenleg(-1);
+            nyertes = osztoName;
+   
+
+        }
+        
+        return nyertes;
+        
+    }
+    
+    public String calculatePoint(List<Card> list){
+        
+        int num = 0;
+        boolean ace = false;
+
+        for (Card card : list) {
+            num += card.getValue();
+            if (card.isAce()) {
+                ace = true;
+            }
+        }
+
+        return ace ? Integer.toString(num) + " / " + Integer.toString(num + 11) : Integer.toString(num);
+        
     }
 
 }

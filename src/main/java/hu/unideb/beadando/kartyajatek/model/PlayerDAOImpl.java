@@ -24,6 +24,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import hu.unideb.beadando.kartyajatek.controller.Controller;
+import javax.xml.transform.TransformerConfigurationException;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 /**
  *
  * @author szilvacsku
@@ -31,9 +34,19 @@ import hu.unideb.beadando.kartyajatek.controller.Controller;
 public class PlayerDAOImpl implements PlayerDAO{
 
     private static final Logger logger = LogManager.getLogger(PlayerDAOImpl.class);
+
+    public PlayerDAOImpl() {
+    
+    }
+    
     
     @Override
     public void registerPlayer(Player player) {
+        
+        String encryptPw = player.getPassword();
+        encryptPw = new EncryptDecrypt().encrypt(encryptPw);
+        
+        player.setPassword(encryptPw);
         
         
         String folder_path = System.getProperty("user.home") + File.separator;
@@ -69,9 +82,14 @@ public class PlayerDAOImpl implements PlayerDAO{
 
                 rootElement.appendChild(playerElement);
 
-                Element name = doc.createElement("nickname");
-                name.appendChild(doc.createTextNode(player.getNickname()));
-                playerElement.appendChild(name);
+                Element name = doc.createElement("name");
+                name.appendChild(doc.createTextNode("LAJOSKA"));
+                playerElement.appendChild(name);               
+                
+                
+                Element nickName = doc.createElement("nickname");
+                nickName.appendChild(doc.createTextNode(player.getNickname()));
+                playerElement.appendChild(nickName);
 
                 Element password = doc.createElement("password");
                 password.appendChild(doc.createTextNode(player.getPassword()));
@@ -103,9 +121,14 @@ public class PlayerDAOImpl implements PlayerDAO{
                 Element root = doc.getDocumentElement();
                 Element playerElement = doc.createElement("player");
 
-                Element name = doc.createElement("nickname");
-                name.appendChild(doc.createTextNode(player.getNickname()));
-                playerElement.appendChild(name);
+                Element name = doc.createElement("name");
+                name.appendChild(doc.createTextNode("LAJOSKA"));
+                playerElement.appendChild(name);               
+                
+                
+                Element nickName = doc.createElement("nickname");
+                nickName.appendChild(doc.createTextNode(player.getNickname()));
+                playerElement.appendChild(nickName);
 
                 Element playerCard = doc.createElement("password");
                 playerCard.appendChild(doc.createTextNode(player.getPassword()));
@@ -135,12 +158,187 @@ public class PlayerDAOImpl implements PlayerDAO{
 
     @Override
     public void removePlayer(Player player) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        Path path = Paths.get(System.getProperty("user.home"), ".blackjack", Controller.getInstance().getPlayerDataFileName());
+        File saveFile = path.toFile();
+        
+        Document document;
+        
+        try {
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+
+            File loadFile = path.toFile();
+
+            if (loadFile.exists()) {
+                
+
+                document = builder.parse(loadFile);
+
+                NodeList nodeList = document.getElementsByTagName("player");
+
+                for (int i = 0; i < nodeList.getLength(); i++) {
+
+                    Node node = nodeList.item(i);
+
+                                        
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        Element e = (Element) node;
+
+                        String nickName = e.getElementsByTagName("nickname").item(0).getTextContent();
+                        String password = e.getElementsByTagName("password").item(0).getTextContent();
+
+                        if (player.getNickname().equals(nickName)) {
+                            while (node.hasChildNodes())
+                                node.removeChild(node.getFirstChild());
+                            logger.info(nickName + " sikeresen torolve!");
+                            break;
+                        }
+
+                    }
+                }
+                
+                
+                TransformerFactory tFactory = TransformerFactory.newInstance();
+                Transformer transformer = tFactory.newTransformer();
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+
+                DOMSource source = new DOMSource(document);
+                StreamResult result = new StreamResult(saveFile);
+                // new File("target/" + datee + ".xml"));
+
+                transformer.transform(source, result);
+                
+                
+            } else {
+                logger.warn("Nincs beolvashato fajl!");
+            }
+
+        } catch (SAXException | IOException | ParserConfigurationException ex) {
+            logger.warn(ex.getStackTrace());
+        } catch (TransformerConfigurationException ex) {
+            logger.warn(ex.getStackTrace());
+        } catch (TransformerException ex) {
+            logger.warn(ex.getStackTrace());
+        }        
+        
+        
+        
     }
 
     @Override
-    public Player getRegisteredPlayer(String nickName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Player getRegisteredPlayer(String _nickName, String _password) {
+        
+        Player player;
+
+        try {
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+
+            Path path = Paths.get(System.getProperty("user.home"), ".blackjack", Controller.getInstance().getPlayerDataFileName());
+
+            File loadFile = path.toFile();
+
+            if (loadFile.exists()) {
+                Document document;
+
+                document = builder.parse(loadFile);
+
+                NodeList nodeList = document.getElementsByTagName("player");
+
+                for (int i = 0; i < nodeList.getLength(); i++) {
+
+                    Node node = nodeList.item(i);
+
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        Element e = (Element) node;
+
+//                        String name     = e.getElementsByTagName("name").item(0).getTextContent();
+                        String nickName = e.getElementsByTagName("nickname").item(0).getTextContent();
+                        String password = e.getElementsByTagName("password").item(0).getTextContent();
+                        
+                        EncryptDecrypt enc = new EncryptDecrypt();
+                        
+                        password = enc.decrypt(password);
+                        
+                        if (_nickName.equals(nickName) && _password.equals(password)) {
+                            player = new Player("a", _nickName, password);
+                            return player;
+                        }
+
+                    }
+                }
+            } else {
+                logger.warn("Nincs beolvashato fajl!");
+            }
+
+        } catch (SAXException | IOException | ParserConfigurationException ex) {
+            logger.info(Data.class.getName());
+        }
+        logger.warn("Nem talaltunk ilyen felhasznalot!");
+        return null;
+    }
+
+    @Override
+    public String getDecryptPassword(String password) {
+        
+        EncryptDecrypt encrypt = new EncryptDecrypt();
+        
+        logger.info("--- Jelszo dekodolva! ---");
+        
+        return encrypt.decrypt(password);
+        
+    }
+
+    @Override
+    public boolean searchPlayer(String _nickname) {
+        try {
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+
+            Path path = Paths.get(System.getProperty("user.home"), ".blackjack", Controller.getInstance().getPlayerDataFileName());
+
+            File loadFile = path.toFile();
+
+            if (loadFile.exists()) {
+                Document document;
+
+                document = builder.parse(loadFile);
+
+                NodeList nodeList = document.getElementsByTagName("player");
+
+                for (int i = 0; i < nodeList.getLength(); i++) {
+
+                    Node node = nodeList.item(i);
+
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        Element e = (Element) node;
+
+//                        String name     = e.getElementsByTagName("name").item(0).getTextContent();
+                        String nickName = e.getElementsByTagName("nickname").item(0).getTextContent();
+                        String password = e.getElementsByTagName("password").item(0).getTextContent();
+                        
+                      
+                        
+                        if (_nickname.equals(nickName)) {
+                            return true;
+                        }
+
+                    }
+                }
+            } else {
+                logger.warn("Nincs beolvashato fajl!");
+            }
+
+        } catch (SAXException | IOException | ParserConfigurationException ex) {
+            logger.info(Data.class.getName());
+        }
+        logger.warn("Nem talaltunk ilyen felhasznalot!");
+        return false;
     }
     
 }

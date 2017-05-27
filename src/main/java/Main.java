@@ -53,16 +53,13 @@ public class Main extends Application {
 
     private void createBorderPane() {
 
-        Controller cont = Controller.getInstance();
-        
-        try {
+       try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(Main.class.getResource("StartFxml.fxml"));
-
+            loader.setLocation(Main.class.getResource("/fxml/StartFxml.fxml"));
             rootGrid = (GridPane) loader.load();
-
+            
             Scene scene = new Scene(rootGrid);
-            scene.getStylesheets().add("styles/Styles.css");
+            scene.getStylesheets().add("../styles/Styles.css");
 
 
             primaryStage.setScene(scene);

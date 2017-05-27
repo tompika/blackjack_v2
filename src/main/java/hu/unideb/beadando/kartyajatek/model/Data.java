@@ -71,10 +71,6 @@ public class Data {
         return recordData;
     }
 
-    public boolean findUserInData(String userName) {
-        return getPlayerInformation(userName).isEmpty();
-    }
-
     public void addPlayer(String nickName, String _password) {
 
         String folder_path = System.getProperty("user.home") + File.separator;
@@ -174,54 +170,6 @@ public class Data {
 
     }
 
-    public List<String> getPlayerInformation(String _nickName) {
-
-        List<String> list = new ArrayList<>();
-
-        try {
-
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-
-            Path path = Paths.get(System.getProperty("user.home"), ".blackjack", LOGIN_DATA_XML);
-
-            File loadFile = path.toFile();
-
-            if (loadFile.exists()) {
-                Document document;
-
-                document = builder.parse(loadFile);
-
-                NodeList nodeList = document.getElementsByTagName("player");
-
-                for (int i = 0; i < nodeList.getLength(); i++) {
-
-                    Node node = nodeList.item(i);
-
-                    if (node.getNodeType() == Node.ELEMENT_NODE) {
-                        Element e = (Element) node;
-
-                        String nickName = e.getElementsByTagName("nickname").item(0).getTextContent();
-                        String password = e.getElementsByTagName("password").item(0).getTextContent();
-
-                        if (_nickName.equals(nickName)) {
-                            list.add(nickName);
-                            list.add(password);
-                            return list;
-                        }
-
-                    }
-                }
-            } else {
-                logger.warn("Nincs beolvashato fajl!");
-            }
-
-        } catch (SAXException | IOException | ParserConfigurationException ex) {
-            logger.info(Data.class.getName());
-        }
-        return list;
-
-    }
     
       public void deleteUser(String _nickName) {
 

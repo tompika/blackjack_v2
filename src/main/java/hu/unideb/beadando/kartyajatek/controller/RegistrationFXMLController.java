@@ -25,7 +25,7 @@ import javafx.scene.control.TextField;
  */
 public class RegistrationFXMLController implements Initializable {
 
-    Controller cont = Controller.getInstance();
+    Controller controller = Controller.getInstance();
     private static Logger logger = Logger.getLogger(StartFXMLController.class.getName());
     
     @FXML
@@ -83,21 +83,15 @@ public class RegistrationFXMLController implements Initializable {
             alert.show();
             return;
         }
-
-        if( cont.equals("sd") ){
-            
-            logger.info("---> Sikeres regisztráció! <---");
-
-            alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Információ");
-            alert.setContentText("Sikeres regisztráció!");
-            
+        
+        if(controller.RegisterPlayer(tfNickName.getText(), pwfPassword.getText()) ){
+        
             tfNickName.setText("");
             pwfPassword.setText("");
             pwfPassword2.setText("");
-                   
+        }           
         
-        }
+        
 
     }
 

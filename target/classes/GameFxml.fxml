@@ -36,14 +36,14 @@
                </padding></HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="2">
                <children>
-                  <Label fx:id="labelPlayerPont" text="Játékos: " textFill="WHITE" />
-                  <Label fx:id="playerPont" prefHeight="16.0" prefWidth="140.0" text="   " textFill="WHITE" />
+                  <Label text="Játékos: " textFill="WHITE" />
+                  <Label fx:id="labelPlayerPoint" prefHeight="16.0" prefWidth="140.0" text="   " textFill="WHITE" />
                </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Label fx:id="labelPcPont" text="Osztó: " textFill="WHITE" />
-                  <Label fx:id="pcPont" prefHeight="16.0" prefWidth="144.0" text="      " textFill="WHITE" />
+                  <Label text="Osztó: " textFill="WHITE" />
+                  <Label fx:id="labelOsztoPoint" prefHeight="16.0" prefWidth="144.0" text="      " textFill="WHITE" />
                </children>
             </HBox>
             <Label fx:id="labelInfo" prefHeight="87.0" prefWidth="292.0" text="   " textFill="#fcfcfc" GridPane.columnIndex="1" GridPane.rowIndex="1" />
@@ -63,17 +63,17 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label fx:id="name" text="Név" textFill="#cdc9c9" wrapText="true" />
-            <Button fx:id="lap" mnemonicParsing="false" onAction="#buttonLapAction" prefHeight="26.0" prefWidth="92.0" text="   Lapot   " GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Label text="Név" textFill="#cdc9c9" wrapText="true" />
+            <Button fx:id="btnLap" mnemonicParsing="false" onAction="#btnLapOnAction" prefHeight="26.0" prefWidth="92.0" text="   Lapot   " GridPane.columnIndex="2" GridPane.rowIndex="1" />
             <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
                <children>
-                  <Button fx:id="buttonTet" mnemonicParsing="false" onAction="#buttonTetAction" text="   Tét    ">
+                  <Button fx:id="btnTet" mnemonicParsing="false" onAction="#btnTetOnAction" text="   Tét    ">
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>
                   </Button>
                   <TextField fx:id="textFieldTet" prefHeight="26.0" prefWidth="160.0" />
-                  <Button fx:id="btnAdmin" mnemonicParsing="false" onAction="#onActionAdmin" text="Felhasználók" />
+                  <Button fx:id="btnAdmin" mnemonicParsing="false" onAction="#btnAdminOnAction" text="Felhasználók" />
                </children>
             </HBox>
             <Label text="Egyenleg" textFill="#cfcfcf" GridPane.rowIndex="1" />
@@ -99,8 +99,8 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Button fx:id="tart" mnemonicParsing="false" onAction="#buttonTart" prefHeight="26.0" prefWidth="89.0" text="   Tart   " />
-                  <Button fx:id="buttonUjKor" mnemonicParsing="false" onAction="#ujKor" text="Új kör" GridPane.columnIndex="1" />
+                  <Button fx:id="btnTart" mnemonicParsing="false" onAction="#btnTartOnAction" prefHeight="26.0" prefWidth="89.0" text="   Tart   " />
+                  <Button fx:id="btnNewRound" mnemonicParsing="false" onAction="#btnNewRoundOnAction" text="Új kör" GridPane.columnIndex="1" />
                </children>
             </GridPane>
             <GridPane GridPane.columnIndex="1" GridPane.rowIndex="1">
@@ -112,7 +112,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label fx:id="labelEgyenleg" prefHeight="16.0" prefWidth="99.0" text="   " textFill="#cfcfcf" />
+                  <Label fx:id="labelBalance" prefHeight="16.0" prefWidth="99.0" text="   " textFill="#cfcfcf" />
                </children>
             </GridPane>
          </children>
@@ -123,7 +123,7 @@
         <menus>
           <Menu mnemonicParsing="false" text="Előzmények">
                <items>
-                  <MenuItem fx:id="miHistory" mnemonicParsing="false" onAction="#mbHistoryOnAction" text="Előzmények" />
+                  <MenuItem fx:id="btnHistory" mnemonicParsing="false" onAction="#btnHistoryOnAction" text="Előzmények" />
                </items></Menu>
         </menus>
       </MenuBar>

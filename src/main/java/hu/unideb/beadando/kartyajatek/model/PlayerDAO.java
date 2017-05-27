@@ -11,8 +11,11 @@ package hu.unideb.beadando.kartyajatek.model;
  */
 public interface PlayerDAO {
     
-    public Player getRegisteredPlayer(String nickName);
+    
     public void registerPlayer(Player player);
     public void removePlayer(Player player);
+    public Player getRegisteredPlayer(String nickName, String password);
+    public String getDecryptPassword(String password);
+    public boolean searchPlayer(String nickname);
     
 }

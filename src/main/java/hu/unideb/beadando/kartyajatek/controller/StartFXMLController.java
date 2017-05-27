@@ -1,5 +1,6 @@
 package hu.unideb.beadando.kartyajatek.controller;
 
+import hu.unideb.beadando.kartyajatek.model.Player;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -35,16 +36,13 @@ public class StartFXMLController implements Initializable {
 
     private static final Logger logger = LogManager.getLogger(StartFXMLController.class);
     
-    Controller cont = Controller.getInstance();
+    Controller controller = Controller.getInstance();
 
     @FXML
     private TextField tfName;
 
     @FXML
     private Button btnLogin;
-
-    @FXML
-    private Button btnHistory;
 
     @FXML
     private PasswordField pfPassword;
@@ -55,9 +53,9 @@ public class StartFXMLController implements Initializable {
     @FXML
     void registrationExecute(ActionEvent event) throws IOException {
 
-        Parent parent = FXMLLoader.load(getClass().getResource("/Registration.fxml"));
+        Parent parent = FXMLLoader.load(getClass().getResource("/fxml/Registration.fxml"));
         Scene scene = new Scene(parent);
-        scene.getStylesheets().add("styles/Styles.css");
+        //scene.getStylesheets().add("../styles/Styles.css");
 
         Stage stage = new Stage();
         stage.setTitle("Regisztráció");
@@ -71,11 +69,15 @@ public class StartFXMLController implements Initializable {
 
     @FXML
     private void textFieldEnter(ActionEvent event) throws IOException {
-        if (!tfName.getText().isEmpty() && !pfPassword.getText().isEmpty()) {
-
-         /*   if (cont.Login(tfName.getText(), pfPassword.getText())) {
+        
+        if ( !getNickNameTextFieldValue().isEmpty() && !getPasswordFieldValue().isEmpty()) {
+            
+            Player player = new Player(getNickNameTextFieldValue(), getPasswordFieldValue());
+            boolean successfull = controller.verifyPlayer(player);
+            
+            if ( successfull ) {
                 logger.info("Sikeres belepes!");
-                         
+                controller.setPlayer(player);
                 
 
             } else {
@@ -86,7 +88,7 @@ public class StartFXMLController implements Initializable {
                 alert.show();
 
                 return;
-            }*/
+            }
 
          
             List<String> choices = new ArrayList<>();
@@ -112,13 +114,13 @@ public class StartFXMLController implements Initializable {
            // cont.setPlayerName(tfName.getText());
            // logger.info("Jatekos neve beallitva: " + cont.getPlayerName());
             
-            tfName.setText("");
-            pfPassword.setText("");
+            setNickNameField("");
+            setPasswordField("");
             
-            Parent login_parent = FXMLLoader.load(getClass().getResource("/GameFxml.fxml"));
+     
+            Parent login_parent = FXMLLoader.load(getClass().getResource("/fxml/GameFxml.fxml"));
             Scene gameScene = new Scene(login_parent);
-            
-            gameScene.getStylesheets().add("styles/Styles.css");
+                 
             //Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             Stage stage = new Stage();
 
@@ -142,8 +144,7 @@ public class StartFXMLController implements Initializable {
     public void initialize(URL arg0, ResourceBundle arg1) {
         //Data data = new Data();
         //data.deleteUser("wasd");
-        
-        btnHistory.setVisible(false);
+    
     }
     
     public void setNickNameField(String value){
@@ -162,4 +163,6 @@ public class StartFXMLController implements Initializable {
         return pfPassword.getText();
     }
 
+    
+    
 }

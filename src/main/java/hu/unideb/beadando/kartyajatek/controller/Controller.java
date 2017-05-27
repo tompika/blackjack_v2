@@ -2,8 +2,11 @@ package hu.unideb.beadando.kartyajatek.controller;
 
 import hu.unideb.beadando.kartyajatek.controller.GameFXMLController;
 import hu.unideb.beadando.kartyajatek.controller.StartFXMLController;
+import hu.unideb.beadando.kartyajatek.manager.GameManagerImpl;
 import hu.unideb.beadando.kartyajatek.model.Card;
 import hu.unideb.beadando.kartyajatek.model.GameModel;
+import hu.unideb.beadando.kartyajatek.model.Player;
+import hu.unideb.beadando.kartyajatek.model.PlayerDAOImpl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,13 +43,11 @@ public class Controller {
     private static Controller instance = null;
     private static final Logger logger = LogManager.getLogger(Controller.class);
 
-    private GameModel gameModel;
-    private GameFXMLController gameView;
-    private StartFXMLController startView;
-
+ 
     private final String playerDataFile = "data.xml";
     private final String roundsFileName = "rounds.xml";
     
+    private GameManagerImpl gameManager;
     
     public static Controller getInstance() {
 
@@ -61,9 +62,14 @@ public class Controller {
     }
 
     public void init() {
-        this.gameModel = new GameModel();
+        this.gameManager = new GameManagerImpl();
     }
 
+    public GameManagerImpl getManager(){
+        return gameManager;
+    }
+    
+    
     public String getPlayerDataFileName(){
         return playerDataFile;
     }
@@ -72,28 +78,14 @@ public class Controller {
         return roundsFileName;
     }
     
-    public GameModel getGameModel(){
-        return gameModel;
+    public void setPlayer(Player player){
+        GameModel gm = gameManager.getGameModel();
+        gm.setPlayer(player);
     }
-            
-    public void viewRegister() throws IOException {
-
-        Parent parent = FXMLLoader.load(getClass().getResource("/Registration.fxml"));
-        Scene scene = new Scene(parent);
-        scene.getStylesheets().add("styles/Styles.css");
-
-        Stage stage = new Stage();
-        stage.setTitle("Regisztráció");
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setScene(scene);
-        stage.setResizable(false);
-        stage.centerOnScreen();
-        stage.show();
-    }
-
+    
     public void viewHistory() throws IOException {
 
-        Parent parent = FXMLLoader.load(getClass().getResource("/HistoryFxml.fxml"));
+        Parent parent = FXMLLoader.load(getClass().getResource("/fxml/HistoryFxml.fxml"));
         Scene scene = new Scene(parent);
 
         Stage stage = new Stage();
@@ -107,7 +99,7 @@ public class Controller {
 
     public void viewGame() throws IOException {
 
-        if (gameModel.Login(startView.getNickNameTextFieldValue(), startView.getPasswordFieldValue()) ) {
+        if ( true ) {
             logger.info("Sikeres belepes!");
 
         } else {
@@ -133,15 +125,13 @@ public class Controller {
         // Traditional way to get the response value.
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()) {
-            gameModel.setPaklikSzama(Integer.valueOf(result.get()));
+            
         }
 
-        Parent login_parent = FXMLLoader.load(getClass().getResource("/GameFxml.fxml"));
+        Parent login_parent = FXMLLoader.load(getClass().getResource("/fxml/GameFxml.fxml"));
         Scene gameScene = new Scene(login_parent);
         gameScene.getStylesheets().add("styles/Styles.css");
 
-        setNickName(startView.getNickNameTextFieldValue());
-        logger.info("Jatekos neve beallitva: " + gameModel.getPlayerName());
 
         Stage stage = new Stage();
         stage.setTitle("BlackJack");
@@ -151,49 +141,52 @@ public class Controller {
         stage.setResizable(false);
         stage.show();
     }
-
-  
-    public void loadCard() {
-        try {
-            gameModel.loadCard();
-        } catch (IOException ex) {
-            logger.info(ex.getStackTrace());
+    
+    public boolean verifyPlayer(Player player){
+        
+        PlayerDAOImpl playerImp = new PlayerDAOImpl();
+        Player temp = playerImp.getRegisteredPlayer(player.getNickname(), player.getPassword());
+        
+        
+        if( temp != null ){
+            return true;
         }
-    }
-
-    int checkLoginName(String nickName) {
-        return 0;
-    }
-
- 
-    public void calculatePoint() {
-
-    }
-
-    public void Login() {
-
-    }
-
-    public Card getBackCard() {
-        return gameModel.getBackCard();
-    }
-
-    public Card getRandomCard() {
-        return gameModel.getRandomCard();
-    }
-
-    public void setPaklikSzama(int value) {
-        gameModel.setPaklikSzama(value);
-    }
-
-    public void setNickName(String value) {
-        gameModel.setPlayerName(value);
+        else{
+            return false;
+        }
+        
     }
     
-    public void setViewController(StartFXMLController controller){
-        this.startView = controller;
+    
+    public boolean RegisterPlayer(String name, String password) {
+    
+        PlayerDAOImpl playerImp = new PlayerDAOImpl();
+        boolean searchSuccess = playerImp.searchPlayer(name);
         
-        logger.info("ViewController beallitva!");
+        if( !searchSuccess ){
+            playerImp.registerPlayer(new Player(name, password));
+            
+            Alert alert = alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Információ");
+            alert.setContentText("Sikeres regisztráció!");
+            alert.showAndWait();
+            
+            return true;
+            
+        }
+        else{
+       
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Hiba");
+            alert.setHeaderText("Hibás felhasználói név");
+            alert.setContentText("Ezt a felhasználói név már használatban van!");
+            alert.showAndWait();
+            
+            return false;
+        
+        }
+
     }
 
+  
 }
