@@ -5,7 +5,8 @@
  */
 package hu.unideb.beadando.kartyajatek.model;
 
-import java.util.List;
+
+import javafx.collections.ObservableList;
 
 /**
  *
@@ -14,6 +15,6 @@ import java.util.List;
 public interface RoundDAO {
     
     public void addRound(Round round);
-    public List<Round> getAllRound();
+    public ObservableList<Round> getAllRound();
     
 }

@@ -49,8 +49,8 @@ public class GameFXMLController implements Initializable {
     
     Card cardPlayer, cardPc;
 
-    List<Card> cardsPlayer;
-    List<Card> cardsPc;
+    List<Card> cardsPlayer = new ArrayList<>();
+    List<Card> cardsPc = new ArrayList<>();
     
 
     ImageView imView;
@@ -77,11 +77,12 @@ public class GameFXMLController implements Initializable {
     @FXML
     private Label labelInfo;
 
-    @FXML
-    private Button btnLap;
 
     @FXML
     private Button btnHit;
+    
+    @FXML
+    private Button btnTet;
 
     @FXML
     private TextField textFieldTet;
@@ -126,8 +127,17 @@ public class GameFXMLController implements Initializable {
 
     @FXML
     void btnHistoryOnAction(ActionEvent event) throws IOException {
+        
+        Parent parent = FXMLLoader.load(getClass().getResource("/fxml/HistoryFxml.fxml"));
+        Scene scene = new Scene(parent);
 
-         controller.viewHistory();
+        Stage stage = new Stage();
+        stage.setTitle("Eredmények");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setScene(scene);
+        stage.centerOnScreen();
+        stage.show();
+        
     }
 
     @FXML
@@ -135,9 +145,8 @@ public class GameFXMLController implements Initializable {
         
         moveLap(hboxPlayerCard, false, cardsPlayer);
         
-        setPointPlayer(100000);
-        
-        //playerPont.setText(calculatePoint(cardsPlayer));
+       
+        setPointPlayer(calculatePoint(cardsPlayer));
 
         btnStand.setDisable(false);
         checkToMuch();
@@ -155,9 +164,11 @@ public class GameFXMLController implements Initializable {
         setPointPlayer(0);
         setPointOszto(0);
 
-        setLabelInfo("uj kor kezdodott!");
+        setLabelInfo("New round!");
 
         btnHit.setDisable(false);
+        
+        startState();
 
     }
 
@@ -191,14 +202,14 @@ public class GameFXMLController implements Initializable {
     @FXML
     void btnTetOnAction(ActionEvent event) {
         
-     /*
+     
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("Hiba");
         alert.setHeaderText(null);
 
         if (!textFieldTet.getText().isEmpty()) {
-            if (Integer.parseInt(textFieldTet.getText()) < 0 || 
-                  controller.getEgyenleg()  <= Integer.parseInt(textFieldTet.getText())) {
+            if (Integer.parseInt(textFieldTet.getText()) < 0 
+                  /*controller.getEgyenleg()  <= Integer.parseInt(textFieldTet.getText() */ ) {
                 //labelInfo.setText("Töltsd fel az egyenleged!");
                 alert.setContentText("NO CASH!");
                 alert.show();
@@ -206,21 +217,24 @@ public class GameFXMLController implements Initializable {
             } else {
 
                 labelTet.setText(textFieldTet.getText());
-                controller.setTet(Integer.valueOf(labelTet.getText()));
+                //controller.setTet(Integer.valueOf(labelTet.getText()));
 
-                lap.setDisable(false);
-                tart.setDisable(false);
+                btnHit.setDisable(false);
+                btnStand.setDisable(false);
                 btnTet.setDisable(true);
-                buttonUjKor.setDisable(true);
+                btnNewRound.setDisable(true);
                 
-                moveLap(hboxPcCard, 1, cardsPc);
-                moveLap(hboxPcCard, 0, cardsPc);
+                moveLap(hboxPcCard, true, cardsPc);
+                moveLap(hboxPcCard, false, cardsPc);
                 
-                moveLap(hboxPlayerCard, 0, cardsPlayer);
-                moveLap(hboxPlayerCard, 0, cardsPlayer);
+                moveLap(hboxPlayerCard, false, cardsPlayer);
+                moveLap(hboxPlayerCard, false, cardsPlayer);
                 
-                playerPont.setText(calculatePoint(cardsPlayer));
-                pcPont.setText(calculatePoint(cardsPc));
+                
+                setPointOszto(calculatePoint(cardsPc));
+                setPointPlayer(calculatePoint(cardsPlayer));
+                
+                
             }
         } else {
 
@@ -228,7 +242,7 @@ public class GameFXMLController implements Initializable {
             alert.show();
         }
         
-        */
+        
          
         
         
@@ -311,7 +325,7 @@ public class GameFXMLController implements Initializable {
     }
 
     private void checkToMuch() {
-        /*
+        
         int player = cardsPlayer.stream()
                 .mapToInt(e -> e.getValue())
                 .sum();
@@ -323,17 +337,21 @@ public class GameFXMLController implements Initializable {
         if(player > 21){
             
             labelInfo.setText("Vesztettél!\nLapjaid összege nagyobb mint 21!");
-            controller.roundToFile(cardsPlayer, cardsPc);
+            //controller.roundToFile(cardsPlayer, cardsPc);
             
-            controller.calculateEgyenleg(-1);
-            labelEgyenleg.setText(String.valueOf(controller.getEgyenleg()));
+            //controller.calculateEgyenleg(-1);
+            //labelEgyenleg.setText(String.valueOf(controller.getEgyenleg()));
             
-            tart.setDisable(true);
-            lap.setDisable(true);
-            buttonUjKor.setDisable(false);
+            //setLabelBalance(pc);
+            
+            
+            
+            btnStand.setDisable(true);
+            btnHit.setDisable(true);
+            btnNewRound.setDisable(false);
             
         }
-         */
+         
     }
 
   
@@ -358,13 +376,13 @@ public class GameFXMLController implements Initializable {
         moveLap(hboxPcCard, true, cardsPc);
         moveLap(hboxPcCard, false, cardsPc);
 
-        //pcPont.setText(calculatePoint(cardsPc));
+        
+        setPointOszto(calculatePoint(cardsPc));
 
         moveLap(hboxPlayerCard, true, cardsPlayer);
         moveLap(hboxPlayerCard, false, cardsPlayer);
 
-        setPointPlayer(0);
-        //playerPont.setText(calculatePoint(cardsPlayer));
+        setPointPlayer(calculatePoint(cardsPlayer));
 
     }
 

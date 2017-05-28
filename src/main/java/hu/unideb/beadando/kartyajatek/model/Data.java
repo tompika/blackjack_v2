@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -313,7 +312,7 @@ public class Data {
     }
 
     public void addRoundToFile(List<Card> playerIn, List<Card> pcIn, String nickName) {
-
+/*
         String folder_path = System.getProperty("user.home") + File.separator;
         folder_path += File.separator + ".blackjack";
         File customDir = new File(folder_path);
@@ -424,14 +423,8 @@ public class Data {
 
         }
         logger.info("Kimeneti fajl: " + saveFile.getPath());
-
+        */
     }
     
-    private String printCards(List<Card> list){
-        String res = "[";
-        res = list.stream().map((card) -> card + " ").reduce(res, String::concat);
-        res+="]";
-        return res;
-    }
 
 }

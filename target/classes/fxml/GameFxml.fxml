@@ -64,10 +64,10 @@
         </rowConstraints>
          <children>
             <Label text="Név" textFill="#cdc9c9" wrapText="true" />
-            <Button fx:id="btnLap" mnemonicParsing="false" onAction="#btnLapOnAction" prefHeight="26.0" prefWidth="92.0" text="   Lapot   " GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Button fx:id="btnHit" mnemonicParsing="false" onAction="#btnLapOnAction" prefHeight="26.0" prefWidth="92.0" text="   Lapot   " GridPane.columnIndex="2" GridPane.rowIndex="1" />
             <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
                <children>
-                  <Button fx:id="btnHit" mnemonicParsing="false" onAction="#btnTetOnAction" text="   Tét    ">
+                  <Button fx:id="btnTet" mnemonicParsing="false" onAction="#btnTetOnAction" text="   Tét    ">
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>

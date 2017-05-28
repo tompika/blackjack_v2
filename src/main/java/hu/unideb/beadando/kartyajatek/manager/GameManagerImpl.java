@@ -10,6 +10,8 @@ import hu.unideb.beadando.kartyajatek.model.Card;
 import hu.unideb.beadando.kartyajatek.model.GameModel;
 import hu.unideb.beadando.kartyajatek.model.Oszto;
 import hu.unideb.beadando.kartyajatek.model.Player;
+import hu.unideb.beadando.kartyajatek.model.RoundDAOImpl;
+import hu.unideb.beadando.kartyajatek.model.Round;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -359,5 +361,23 @@ public class GameManagerImpl implements GameManager {
         return ace ? Integer.toString(num) + " / " + Integer.toString(num + 11) : Integer.toString(num);
         
     }
+    
+    public void roundToFile(Round _round){
+        
+        RoundDAOImpl roundimpl =  new RoundDAOImpl();
+        
+        roundimpl.addRound(_round);
+        
+        logger.info("Az adott kor kiirasra kerul!");
+        
+    }
+    
+    private String cardsToString(List<Card> list){
+        String res = "[";
+        res = list.stream().map((card) -> card + " ").reduce(res, String::concat);
+        res+="]";
+        return res;
+    }
+    
 
 }

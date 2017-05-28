@@ -83,20 +83,7 @@ public class Controller {
         gm.setPlayer(player);
     }
     
-    public void viewHistory() throws IOException {
-
-        Parent parent = FXMLLoader.load(getClass().getResource("/fxml/HistoryFxml.fxml"));
-        Scene scene = new Scene(parent);
-
-        Stage stage = new Stage();
-        stage.setTitle("Eredmények");
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setScene(scene);
-        stage.centerOnScreen();
-        stage.show();
-
-    }
-
+    
     public void viewGame() throws IOException {
 
         if ( true ) {

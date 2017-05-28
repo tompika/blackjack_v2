@@ -45,9 +45,7 @@ public class Main extends Application {
         this.primaryStage = primaryStage;
 
         primaryStage.setTitle("BlackJack v2.0");
-        createBorderPane();
-        
-       
+        createBorderPane();       
         
     }
 

@@ -82,11 +82,7 @@ public class PlayerDAOImpl implements PlayerDAO{
 
                 rootElement.appendChild(playerElement);
 
-                Element name = doc.createElement("name");
-                name.appendChild(doc.createTextNode("LAJOSKA"));
-                playerElement.appendChild(name);               
-                
-                
+                        
                 Element nickName = doc.createElement("nickname");
                 nickName.appendChild(doc.createTextNode(player.getNickname()));
                 playerElement.appendChild(nickName);
@@ -106,7 +102,7 @@ public class PlayerDAOImpl implements PlayerDAO{
                 transformer.transform(source, result);
 
             } catch (ParserConfigurationException | TransformerException e) {
-                logger.warn(e.getStackTrace());
+                logger.warn(e.getStackTrace().toString());
             }
 
         } else {
@@ -121,11 +117,7 @@ public class PlayerDAOImpl implements PlayerDAO{
                 Element root = doc.getDocumentElement();
                 Element playerElement = doc.createElement("player");
 
-                Element name = doc.createElement("name");
-                name.appendChild(doc.createTextNode("LAJOSKA"));
-                playerElement.appendChild(name);               
-                
-                
+     
                 Element nickName = doc.createElement("nickname");
                 nickName.appendChild(doc.createTextNode(player.getNickname()));
                 playerElement.appendChild(nickName);
@@ -148,7 +140,7 @@ public class PlayerDAOImpl implements PlayerDAO{
                 transformer.transform(source, result);
 
             } catch (SAXException | IOException | ParserConfigurationException | TransformerException e) {
-                logger.warn(e.getStackTrace());
+                logger.warn(e.getStackTrace().toString());
             }
 
         }
@@ -158,7 +150,7 @@ public class PlayerDAOImpl implements PlayerDAO{
 
     @Override
     public void removePlayer(Player player) {
-        
+        ///Nem 100%
         Path path = Paths.get(System.getProperty("user.home"), ".blackjack", Controller.getInstance().getPlayerDataFileName());
         File saveFile = path.toFile();
         
@@ -189,6 +181,7 @@ public class PlayerDAOImpl implements PlayerDAO{
                         String nickName = e.getElementsByTagName("nickname").item(0).getTextContent();
                         String password = e.getElementsByTagName("password").item(0).getTextContent();
 
+                                                
                         if (player.getNickname().equals(nickName)) {
                             while (node.hasChildNodes())
                                 node.removeChild(node.getFirstChild());
@@ -217,11 +210,11 @@ public class PlayerDAOImpl implements PlayerDAO{
             }
 
         } catch (SAXException | IOException | ParserConfigurationException ex) {
-            logger.warn(ex.getStackTrace());
+            logger.warn(ex.getStackTrace().toString());
         } catch (TransformerConfigurationException ex) {
-            logger.warn(ex.getStackTrace());
+            logger.warn(ex.getStackTrace().toString());
         } catch (TransformerException ex) {
-            logger.warn(ex.getStackTrace());
+            logger.warn(ex.getStackTrace().toString());
         }        
         
         
